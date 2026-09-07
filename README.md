@@ -60,7 +60,7 @@ The production Google callback is:
 https://b15-notes-tanishq.vercel.app/api/auth/callback/google
 ```
 
-`npm run vercel-build` applies checked database migrations and imports the 20 digital notes once before building. Re-running it does not overwrite later admin edits.
+Run `npm run db:migrate` after connecting a new database. It applies checked migrations and imports the 20 digital notes once. Re-running it does not overwrite later admin edits.
 
 ## Useful commands
 

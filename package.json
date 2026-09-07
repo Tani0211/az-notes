@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "npm run db:migrate && next build",
     "start": "next start",
     "lint": "oxlint",
     "format": "oxfmt",
