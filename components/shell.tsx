@@ -1,5 +1,5 @@
 'use client';
-/* oxlint-disable nextjs/no-html-link-for-pages -- SIWC sign-out requires top-level anchor navigation. */
+/* oxlint-disable nextjs/no-html-link-for-pages -- Auth.js sign-out requires top-level navigation. */
 import Link from 'next/link';
 import {
   BookOpen,

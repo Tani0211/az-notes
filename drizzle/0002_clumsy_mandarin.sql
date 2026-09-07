@@ -1,1 +1,0 @@
-ALTER TABLE `notes` ADD `phase` integer DEFAULT -1 NOT NULL;

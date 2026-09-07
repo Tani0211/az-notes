@@ -1,32 +1,30 @@
 import { Auth, type AuthConfig } from '@auth/core';
 import Google from '@auth/core/providers/google';
-import { env } from 'cloudflare:workers';
 import { headers } from 'next/headers';
 
 export function googleReady() {
   return Boolean(
-    env.AUTH_SECRET &&
-    env.GOOGLE_CLIENT_ID &&
-    env.GOOGLE_CLIENT_SECRET &&
-    env.PUBLIC_ORIGIN,
+    process.env.AUTH_SECRET &&
+    process.env.GOOGLE_CLIENT_ID &&
+    process.env.GOOGLE_CLIENT_SECRET &&
+    process.env.PUBLIC_ORIGIN,
   );
 }
 export function authOrigin() {
-  return import.meta.env.DEV
+  return process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : env.PUBLIC_ORIGIN ||
-        'https://b15-notes-library.singhalrashmi0211.chatgpt.site';
+    : process.env.PUBLIC_ORIGIN || 'https://b15-notes-tanishq.vercel.app';
 }
 export function authConfig(): AuthConfig {
   return {
     basePath: '/api/auth',
-    secret: env.AUTH_SECRET,
+    secret: process.env.AUTH_SECRET,
     trustHost: true,
-    useSecureCookies: !import.meta.env.DEV,
+    useSecureCookies: process.env.NODE_ENV !== 'development',
     providers: [
       Google({
-        clientId: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         authorization: { params: { scope: 'openid email profile' } },
       }),
     ],
@@ -81,8 +79,7 @@ export async function authHandler(request: Request) {
   if (!googleReady())
     return Response.json(
       {
-        error:
-          'Google sign-in is not available yet. Please use ChatGPT sign-in.',
+        error: 'Google sign-in is not configured yet.',
       },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },
     );

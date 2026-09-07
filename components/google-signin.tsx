@@ -45,7 +45,7 @@ export function GoogleSignIn({ ready }: { ready: boolean }) {
       </button>
       {!ready && (
         <p className="fineprint">
-          Google sign-in is coming soon. ChatGPT sign-in is available now.
+          Google sign-in is being configured for this deployment.
         </p>
       )}
       {error && (

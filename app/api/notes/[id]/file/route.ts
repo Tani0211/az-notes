@@ -1,12 +1,13 @@
+import { get } from '@vercel/blob';
 import {
   apiUser,
   findNote,
   driveId,
-  files,
   errorResponse,
   ApiError,
   db,
 } from '../../../../../lib/server';
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -28,30 +29,22 @@ export async function GET(
       'Content-Disposition':
         (download ? 'attachment' : 'inline') + '; filename="' + name + '"',
     });
-    let body: ReadableStream | null = null;
+    let body: ReadableStream<Uint8Array> | null = null;
     let status = 200;
+
     if (note.fileKey) {
-      const object = await files().get(note.fileKey, { range: req.headers });
+      const object = await get(note.fileKey, {
+        access: 'private',
+        ifNoneMatch: download
+          ? undefined
+          : req.headers.get('if-none-match') || undefined,
+      });
       if (!object) throw new ApiError('The PDF could not be found.', 404);
-      body = object.body;
-      headers.set('Accept-Ranges', 'bytes');
-      headers.set('ETag', object.httpEtag);
-      const range = object.range as
-        | { offset?: number; length?: number; suffix?: number }
-        | undefined;
-      if (range && req.headers.has('range')) {
-        const offset =
-          range.offset ??
-          Math.max(0, object.size - (range.suffix ?? object.size));
-        const length =
-          range.length ?? Math.min(range.suffix ?? object.size, object.size);
-        headers.set(
-          'Content-Range',
-          `bytes ${offset}-${offset + length - 1}/${object.size}`,
-        );
-        headers.set('Content-Length', String(length));
-        status = 206;
-      } else headers.set('Content-Length', String(object.size));
+      headers.set('ETag', object.blob.etag);
+      if (object.statusCode === 304)
+        return new Response(null, { status: 304, headers });
+      body = object.stream;
+      headers.set('Content-Length', String(object.blob.size));
     } else {
       const drive = driveId(note.driveUrl);
       if (!drive) throw new ApiError('No PDF is attached yet.', 404);
@@ -78,9 +71,11 @@ export async function GET(
         );
       body = upstream.body;
       status = upstream.status;
-      for (const k of ['content-length', 'content-range', 'accept-ranges'])
-        if (upstream.headers.has(k)) headers.set(k, upstream.headers.get(k)!);
+      for (const key of ['content-length', 'content-range', 'accept-ranges'])
+        if (upstream.headers.has(key))
+          headers.set(key, upstream.headers.get(key)!);
     }
+
     if (download && !req.headers.has('range'))
       await db()
         .prepare(

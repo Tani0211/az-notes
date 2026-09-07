@@ -1,22 +1,19 @@
 import initialCalendar from '../content/phase-calendar.json';
 import type { PhasePeriod } from './calendar';
-import { env } from 'cloudflare:workers';
-import { getChatGPTUser } from '../app/chatgpt-auth';
 import { googleUser } from './google-auth';
+import { db } from './database';
 import { redirect } from 'next/navigation';
 import seed from '../content/seed.json';
 import type { Note, Viewer, ReadingState } from './types';
 export const ADMIN_EMAIL = 'singhalrashmi0211@gmail.com';
-export const db = () => env.DB;
-export const files = () => env.FILES;
+export { db } from './database';
 export const isAdmin = (email: string) =>
   email.trim().toLowerCase() === ADMIN_EMAIL;
 export async function viewer(
   required = false,
   path = '/library',
 ): Promise<Viewer | null> {
-  const google = await googleUser();
-  const user = google || (await getChatGPTUser());
+  const user = await googleUser();
   if (!user && required) redirect('/?returnTo=' + encodeURIComponent(path));
   if (!user) return null;
   const owner = isAdmin(user.email);
@@ -32,10 +29,7 @@ export async function viewer(
     displayName: user.fullName || 'Learner',
     admin: granted,
     owner,
-    signOutPath: google
-      ? '/api/auth/signout?callbackUrl=' +
-        encodeURIComponent('/signout-with-chatgpt?return_to=/')
-      : '/signout-with-chatgpt?return_to=/',
+    signOutPath: '/api/auth/signout?callbackUrl=' + encodeURIComponent('/'),
   };
 }
 export async function initialize() {

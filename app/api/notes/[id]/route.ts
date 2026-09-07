@@ -2,12 +2,12 @@ import {
   apiUser,
   validateNote,
   db,
-  files,
   json,
   errorResponse,
   ApiError,
   findNote,
 } from '../../../../lib/server';
+import { verifyStoredPdf } from '../../../../lib/storage';
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -20,8 +20,7 @@ export async function PUT(
     if (Number(req.headers.get('content-length')) > 15000)
       throw new ApiError('Lecture details are too long.');
     const n = validateNote(await req.json());
-    if (n.fileKey && !(await files().head(n.fileKey)))
-      throw new ApiError('The uploaded PDF is missing.');
+    if (n.fileKey) await verifyStoredPdf(n.fileKey);
     await db()
       .prepare(
         'UPDATE notes SET title=?,topic=?,date=?,week=?,phase=?,summary=?,driveUrl=?,codeUrl=?,fileKey=?,status=?,updatedAt=? WHERE id=?',

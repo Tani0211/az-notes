@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { upload as uploadBlob } from '@vercel/blob/client';
 import {
   Plus,
   ArrowUpRight,
@@ -102,14 +103,20 @@ export function AdminView({
     }
     setBusy(true);
     try {
-      const f = new FormData();
-      f.set('file', file);
-      const r = await fetch('/api/upload', {
-        method: 'POST',
+      const pathname = `notes/${crypto.randomUUID()}.pdf`;
+      const blob = await uploadBlob(pathname, file, {
+        access: 'private',
+        handleUploadUrl: '/api/upload',
         headers: { 'x-b15-action': '1' },
-        body: f,
+        multipart: true,
+        contentType: 'application/pdf',
       });
-      const d = (await r.json()) as { id: string; key: string; error?: string };
+      const r = await fetch('/api/upload/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        body: JSON.stringify({ pathname: blob.pathname }),
+      });
+      const d = (await r.json()) as { key: string; error?: string };
       if (!r.ok) throw Error(d.error);
       field('fileKey', d.key);
       setMessage(`${file.name} uploaded. Save the lecture to attach it.`);

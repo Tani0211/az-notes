@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { chatGPTSignInPath } from './chatgpt-auth';
 import { viewer } from '../lib/server';
 import { googleReady } from '../lib/google-auth';
 import { GoogleSignIn } from '../components/google-signin';
@@ -10,7 +9,6 @@ import {
   LockKeyhole,
   Code2,
   Layers3,
-  ArrowRight,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/theme-toggle';
 export const dynamic = 'force-dynamic';
@@ -85,16 +83,9 @@ export default async function Home() {
               track of your revision.
             </p>
             <GoogleSignIn ready={googleReady()} />
-            <a
-              className="button primary wide"
-              target="_top"
-              href={chatGPTSignInPath('/library')}
-            >
-              Sign in with ChatGPT <ArrowRight size={18} />
-            </a>
             <p className="fineprint">
               Everyone is welcome. Your notes and revision progress stay in your
-              account.
+              Google account.
             </p>
           </div>
         </section>

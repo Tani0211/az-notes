@@ -45,13 +45,13 @@ export default async function Admin() {
         .first<{ total: number }>(),
       db()
         .prepare(
-          "SELECT date(createdAt/1000,'unixepoch','+5 hours','+30 minutes') AS day, COUNT(*) AS total FROM events WHERE createdAt>=? AND kind='view' GROUP BY day ORDER BY day",
+          "SELECT to_char(to_timestamp(createdAt / 1000.0) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') AS day, COUNT(*) AS total FROM events WHERE createdAt>=? AND kind='view' GROUP BY day ORDER BY day",
         )
         .bind(Date.now() - 7 * 86400000)
         .all<{ day: string; total: number }>(),
       db()
         .prepare(
-          "SELECT notes.title,COUNT(*) AS total FROM events JOIN notes ON notes.id=events.noteId WHERE events.kind='view' GROUP BY noteId ORDER BY total DESC LIMIT 5",
+          "SELECT notes.title,COUNT(*) AS total FROM events JOIN notes ON notes.id=events.noteId WHERE events.kind='view' GROUP BY notes.id, notes.title ORDER BY total DESC LIMIT 5",
         )
         .all<{ title: string; total: number }>(),
       user!.owner
