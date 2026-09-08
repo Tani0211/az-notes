@@ -6,7 +6,6 @@ type Row = Record<string, unknown>;
 const preservedIdentifiers = new Map(
   [
     'driveUrl',
-    'codeUrl',
     'fileKey',
     'updatedAt',
     'joinedAt',

@@ -23,7 +23,7 @@ export async function PUT(
     if (n.fileKey) await verifyStoredPdf(n.fileKey);
     await db()
       .prepare(
-        'UPDATE notes SET title=?,topic=?,date=?,week=?,phase=?,summary=?,driveUrl=?,codeUrl=?,fileKey=?,status=?,updatedAt=? WHERE id=?',
+        'UPDATE notes SET title=?,topic=?,date=?,week=?,phase=?,summary=?,driveUrl=?,fileKey=?,status=?,updatedAt=? WHERE id=?',
       )
       .bind(
         n.title,
@@ -33,7 +33,6 @@ export async function PUT(
         n.phase,
         n.summary,
         n.driveUrl,
-        n.codeUrl,
         n.fileKey,
         n.status,
         Date.now(),

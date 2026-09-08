@@ -35,13 +35,13 @@ export async function viewer(
 export async function initialize() {
   const ready = await db()
     .prepare('SELECT value FROM settings WHERE key = ?')
-    .bind('b15-seed-v1')
+    .bind('az-notes-seed-v1')
     .first();
   if (ready) return;
   const statements = seed.map((n) =>
     db()
       .prepare(
-        'INSERT OR IGNORE INTO notes (id,title,topic,date,week,phase,summary,driveUrl,codeUrl,fileKey,status,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+        'INSERT OR IGNORE INTO notes (id,title,topic,date,week,phase,summary,driveUrl,fileKey,status,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
       )
       .bind(
         n.id,
@@ -52,7 +52,6 @@ export async function initialize() {
         n.phase,
         n.summary,
         n.driveUrl,
-        n.codeUrl,
         '',
         'published',
         Date.now(),
@@ -61,7 +60,7 @@ export async function initialize() {
   statements.push(
     db()
       .prepare('INSERT OR IGNORE INTO settings (key,value) VALUES (?,?)')
-      .bind('b15-seed-v1', 'imported'),
+      .bind('az-notes-seed-v1', 'imported'),
   );
   await db().batch(statements);
 }
@@ -114,7 +113,7 @@ export function json(data: unknown, status = 200) {
 export function sameOrigin(req: Request) {
   const origin = req.headers.get('origin');
   return (
-    req.headers.get('x-b15-action') === '1' &&
+    req.headers.get('x-az-notes-action') === '1' &&
     (!origin || origin === new URL(req.url).origin)
   );
 }
@@ -168,7 +167,6 @@ export function validateNote(input: unknown): Omit<Note, 'id' | 'updatedAt'> {
     date = str('date', 10),
     summary = str('summary', 3000),
     driveUrl = str('driveUrl', 500),
-    codeUrl = str('codeUrl', 500),
     fileKey = str('fileKey', 200);
   const week = Number(n.week ?? 0);
   const phase = Number(n.phase ?? -1);
@@ -185,16 +183,6 @@ export function validateNote(input: unknown): Omit<Note, 'id' | 'updatedAt'> {
   for (const url of [driveUrl])
     if (url && !driveId(url))
       throw new ApiError('Use a Google Drive file sharing link.');
-  if (codeUrl) {
-    let valid = false;
-    try {
-      const u = new URL(codeUrl);
-      valid =
-        u.protocol === 'https:' &&
-        ['gist.github.com', 'github.com'].includes(u.hostname);
-    } catch {}
-    if (!valid) throw new ApiError('Use an HTTPS GitHub or GitHub Gist link.');
-  }
   if (fileKey && !/^notes\/[a-f0-9-]+\.pdf$/.test(fileKey))
     throw new ApiError('Invalid uploaded file.');
   const status =
@@ -214,7 +202,6 @@ export function validateNote(input: unknown): Omit<Note, 'id' | 'updatedAt'> {
     phase,
     summary,
     driveUrl,
-    codeUrl,
     fileKey,
     status,
   };

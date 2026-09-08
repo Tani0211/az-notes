@@ -7,7 +7,6 @@ export type Note = {
   phase: number;
   summary: string;
   driveUrl: string;
-  codeUrl: string;
   fileKey: string;
   status: 'published' | 'draft';
   updatedAt?: number;

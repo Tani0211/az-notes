@@ -7,7 +7,6 @@ import {
   Bookmark,
   CheckCheck,
   ShieldCheck,
-  ArrowUpRight,
   LogOut,
   Menu,
   X,
@@ -35,7 +34,7 @@ export function Shell({
       try {
         const r = await fetch('/api/presence', {
           method: 'POST',
-          headers: { 'x-b15-action': '1' },
+          headers: { 'x-az-notes-action': '1' },
         });
         if (!r.ok) throw Error();
         const d = (await r.json()) as { online: number };
@@ -72,7 +71,7 @@ export function Shell({
               <BookOpen size={22} />
             </span>
             <span>
-              B15<span className="brand-light"> Notes</span>
+              AZ<span className="brand-light"> Notes</span>
               <small>THE DSA NOTEBOOK</small>
             </span>
           </Link>
@@ -84,11 +83,11 @@ export function Shell({
             <X size={18} />
           </button>
         </div>
-        <div className="batch-card">
-          <span className="batch-icon">15</span>
+        <div className="collection-card">
+          <span className="collection-icon">AZ</span>
           <div>
-            <strong>AlgoZenith B15</strong>
-            <small>DSA · Vivek Gupta</small>
+            <strong>AZ Notes</strong>
+            <small>Structured DSA learning</small>
           </div>
           <span className="tiny-dot" />
         </div>
@@ -133,15 +132,7 @@ export function Shell({
               <strong>Stronger foundations.</strong>
             </p>
           </div>
-          <a
-            className="platform-link"
-            href="https://maang.in"
-            target="_blank"
-            rel="noreferrer"
-          >
-            AlgoZenith platform <ArrowUpRight size={15} />
-          </a>
-          <div className="sidebar-credit">An independent B15 companion.</div>
+          <div className="sidebar-credit">Made for learners everywhere.</div>
         </div>
       </aside>
       <div className="app-body">
@@ -157,7 +148,7 @@ export function Shell({
             <span>
               Workspace <span className="breadcrumb-slash">/</span>{' '}
               <strong>
-                {active === 'admin' ? 'Administration' : 'Batch 15'}
+                {active === 'admin' ? 'Administration' : 'Lecture library'}
               </strong>
             </span>
           </div>

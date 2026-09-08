@@ -1,8 +1,8 @@
-# B15 Notes
+# AZ Notes
 
-An authenticated digital DSA lecture-notes portal for AlgoZenith Batch 15. It includes light and dark themes, phase and week organization, saved/revised progress, an owner-managed admin team, direct PDF uploads, Google Drive notes, usage analytics and a live online count.
+An authenticated digital DSA notes library for students everywhere. It includes light and dark themes, phase and week organization, saved/revised progress, an owner-managed admin team, direct PDF uploads, Google Drive notes, usage analytics and a live online count.
 
-Only digital notes are included. The imported Google Sheet code column and all handwritten-note features were intentionally removed. Links embedded inside the author's own PDFs still work.
+The library contains only the author's digital lecture notes. Links embedded inside those PDFs continue to work.
 
 ## How the project works
 
@@ -45,19 +45,19 @@ Open `http://localhost:3000`. The local Google callback is `http://localhost:300
 
 The Vercel project needs these environment variables:
 
-| Variable                | Purpose                                                               |
-| ----------------------- | --------------------------------------------------------------------- |
-| `DATABASE_URL`          | Neon pooled PostgreSQL connection, supplied by the integration        |
-| `BLOB_READ_WRITE_TOKEN` | Private Vercel Blob access, supplied by the connected store           |
-| `AUTH_SECRET`           | Random session-encryption secret                                      |
-| `GOOGLE_CLIENT_ID`      | Google OAuth web client identifier                                    |
-| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                                            |
-| `PUBLIC_ORIGIN`         | The production origin, such as `https://b15-notes-tanishq.vercel.app` |
+| Variable                | Purpose                                                        |
+| ----------------------- | -------------------------------------------------------------- |
+| `DATABASE_URL`          | Neon pooled PostgreSQL connection, supplied by the integration |
+| `BLOB_READ_WRITE_TOKEN` | Private Vercel Blob access, supplied by the connected store    |
+| `AUTH_SECRET`           | Random session-encryption secret                               |
+| `GOOGLE_CLIENT_ID`      | Google OAuth web client identifier                             |
+| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                                     |
+| `PUBLIC_ORIGIN`         | The production origin, such as `https://az-notes.vercel.app`   |
 
 The production Google callback is:
 
 ```text
-https://b15-notes-tanishq.vercel.app/api/auth/callback/google
+https://az-notes.vercel.app/api/auth/callback/google
 ```
 
 Run `npm run db:migrate` after connecting a new database. It applies checked migrations and imports the 20 digital notes once. Re-running it does not overwrite later admin edits.

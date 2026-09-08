@@ -25,7 +25,6 @@ const emptyNote: Note = {
   phase: -1,
   summary: '',
   driveUrl: '',
-  codeUrl: '',
   fileKey: '',
   status: 'draft',
 };
@@ -72,7 +71,10 @@ export function AdminView({
     try {
       const r = await fetch(edit.id ? '/api/notes/' + edit.id : '/api/notes', {
         method: edit.id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-az-notes-action': '1',
+        },
         body: JSON.stringify(edit),
       });
       const d = (await r.json()) as { id: string; key: string; error?: string };
@@ -107,13 +109,16 @@ export function AdminView({
       const blob = await uploadBlob(pathname, file, {
         access: 'private',
         handleUploadUrl: '/api/upload',
-        headers: { 'x-b15-action': '1' },
+        headers: { 'x-az-notes-action': '1' },
         multipart: true,
         contentType: 'application/pdf',
       });
       const r = await fetch('/api/upload/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-az-notes-action': '1',
+        },
         body: JSON.stringify({ pathname: blob.pathname }),
       });
       const d = (await r.json()) as { key: string; error?: string };
@@ -142,7 +147,10 @@ export function AdminView({
     try {
       const r = await fetch('/api/admins', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-az-notes-action': '1',
+        },
         body: JSON.stringify({ email: target, action }),
       });
       const d = (await r.json()) as { id: string; key: string; error?: string };
@@ -439,16 +447,6 @@ export function AdminView({
                   </div>
                 )}
               </div>
-              <label>
-                Your lecture code — GitHub or Gist
-                <input
-                  type="url"
-                  maxLength={500}
-                  value={edit.codeUrl}
-                  onChange={(e) => field('codeUrl', e.target.value)}
-                  placeholder="https://gist.github.com/…"
-                />
-              </label>
             </div>
             <div className="form-actions">
               <span className="muted" style={{ fontSize: 12 }}>
@@ -658,7 +656,7 @@ export function AdminView({
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    'x-b15-action': '1',
+                    'x-az-notes-action': '1',
                   },
                   body: JSON.stringify(calendar),
                 });
@@ -822,8 +820,7 @@ export function AdminView({
             </li>
             <li>
               <strong>Attach the notes.</strong> Paste a Drive file link or
-              upload a PDF of up to 30 MB. Add a GitHub code link when
-              available.
+              upload a PDF of up to 30 MB.
             </li>
             <li>
               <strong>Save a draft.</strong> Open its preview from the
@@ -847,9 +844,9 @@ export function AdminView({
           </div>
           <h3 style={{ margin: '25px 0 10px' }}>What your students can do</h3>
           <p className="admin-intro">
-            Sign in, search by topic or week, read your digital PDFs, follow
-            code links, bookmark lectures, save a page number, and mark lectures
-            as revised. Their revision state is stored in their account.
+            Sign in, search by topic or week, read your digital PDFs, bookmark
+            lectures, save a page number, and mark lectures as revised. Their
+            revision state is stored in their account.
           </p>
         </section>
       )}

@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const id = crypto.randomUUID();
     await db()
       .prepare(
-        'INSERT INTO notes (id,title,topic,date,week,phase,summary,driveUrl,codeUrl,fileKey,status,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO notes (id,title,topic,date,week,phase,summary,driveUrl,fileKey,status,updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
       )
       .bind(
         id,
@@ -37,7 +37,6 @@ export async function POST(req: Request) {
         n.phase,
         n.summary,
         n.driveUrl,
-        n.codeUrl,
         n.fileKey,
         n.status,
         Date.now(),

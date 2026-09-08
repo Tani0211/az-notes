@@ -18,7 +18,7 @@ export function ThemeToggle() {
     const next = !dark;
     document.documentElement.dataset.theme = next ? 'dark' : 'light';
     try {
-      localStorage.setItem('b15-theme', next ? 'dark' : 'light');
+      localStorage.setItem('az-notes-theme', next ? 'dark' : 'light');
     } catch {}
   }
   return (

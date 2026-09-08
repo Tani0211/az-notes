@@ -10,7 +10,6 @@ import {
   Check,
   ArrowUpRight,
   CalendarDays,
-  Code2,
   FileText,
   X,
   ArrowRight,
@@ -80,9 +79,9 @@ export function LibraryView({
       Promise.resolve(
         context.registerTool(
           {
-            name: 'filter_b15_notes',
+            name: 'filter_az_notes',
             description:
-              'Filter the visible B15 lecture library by a search term.',
+              'Filter the visible AZ Notes library by a search term.',
             inputSchema: {
               type: 'object',
               properties: { query: { type: 'string', maxLength: 150 } },
@@ -114,7 +113,10 @@ export function LibraryView({
     try {
       const r = await fetch(`/api/notes/${n.id}/state`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-az-notes-action': '1',
+        },
         body: JSON.stringify({ saved: !states.get(n.id)?.saved }),
       });
       const d = (await r.json()) as ReadingState & { error?: string };
@@ -132,10 +134,10 @@ export function LibraryView({
         <div>
           <span className="eyebrow">LEARN. REVISIT. UNDERSTAND.</span>
           <h1>Your DSA notebook</h1>
-          <p>One place for every lecture, idea, and line of code.</p>
+          <p>One place for every lecture, concept, and explanation.</p>
         </div>
-        <span className="cohort-badge">
-          <span className="tiny-dot" /> BATCH 15
+        <span className="library-badge">
+          <span className="tiny-dot" /> DIGITAL DSA NOTES
         </span>
       </div>
       <div className="overview">
@@ -181,7 +183,7 @@ export function LibraryView({
       </div>
       <section className="phase-section" aria-label="Course phases">
         <div className="phase-heading">
-          <h2>Your course, phase by phase</h2>
+          <h2>Your learning path, phase by phase</h2>
           <button
             className={phase === 'all' ? 'phase-all selected' : 'phase-all'}
             onClick={() => setPhase('all')}
@@ -219,7 +221,7 @@ export function LibraryView({
         <div className="library-heading">
           <div>
             <h2>Lecture library</h2>
-            <span>Notes from Vivek Gupta sir’s live sessions</span>
+            <span>Clear digital notes organized for focused revision</span>
           </div>
           <div className="segmented icon-segment">
             <button
@@ -367,11 +369,6 @@ export function LibraryView({
                 <span>
                   <FileText size={13} /> Digital PDF
                 </span>
-                {n.codeUrl && (
-                  <span>
-                    <Code2 size={13} /> Code
-                  </span>
-                )}
               </div>
               <div className="card-bottom">
                 <span>
@@ -424,12 +421,12 @@ export function LibraryView({
           <span>
             {filtered.length} of {notes.length} lectures
           </span>
-          <span>Updated as the batch learns.</span>
+          <span>Updated as new lectures are taught.</span>
         </div>
       </section>
       <div className="workspace-footer">
-        <span>B15 Notes · A companion for your DSA journey</span>
-        <span>Lecture material by Vivek Gupta</span>
+        <span>AZ Notes · A companion for your DSA journey</span>
+        <span>Curated digital DSA notes</span>
       </div>
     </Shell>
   );

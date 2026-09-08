@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 export const metadata: Metadata = {
-  title: 'B15 Notes · The DSA notebook',
+  title: 'AZ Notes · The DSA notebook',
   icons: { icon: '/favicon.svg' },
   description:
-    'A lecture notes and revision companion for AlgoZenith B15. Read DSA notes, revisit code, and track your learning.',
+    'A structured digital DSA notes library for students everywhere. Read notes, save your place, and track your revision.',
 };
 export default function RootLayout({
   children,
@@ -18,7 +18,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{document.documentElement.dataset.theme=localStorage.getItem('b15-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}catch{}",
+              "try{document.documentElement.dataset.theme=localStorage.getItem('az-notes-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}catch{}",
           }}
         />
       </head>

@@ -7,7 +7,6 @@ CREATE TABLE notes (
   phase integer NOT NULL DEFAULT -1 CHECK (phase BETWEEN -1 AND 5),
   summary text NOT NULL DEFAULT '',
   "driveUrl" text NOT NULL DEFAULT '',
-  "codeUrl" text NOT NULL DEFAULT '',
   "fileKey" text NOT NULL DEFAULT '',
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
   "updatedAt" bigint NOT NULL

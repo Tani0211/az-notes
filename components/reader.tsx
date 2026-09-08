@@ -6,7 +6,6 @@ import {
   ArrowUpRight,
   Bookmark,
   Check,
-  Code2,
   Download,
   FileText,
   Maximize2,
@@ -37,7 +36,7 @@ export function Reader({
   useEffect(() => {
     void fetch(`/api/notes/${note.id}/event`, {
       method: 'POST',
-      headers: { 'x-b15-action': '1' },
+      headers: { 'x-az-notes-action': '1' },
     }).catch(() => {});
   }, [note.id]);
   async function update(values: Record<string, number | boolean>) {
@@ -47,7 +46,10 @@ export function Reader({
     try {
       const r = await fetch(`/api/notes/${note.id}/state`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-b15-action': '1' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-az-notes-action': '1',
+        },
         body: JSON.stringify(values),
       });
       const d = (await r.json()) as ReadingState & { error?: string };
@@ -81,7 +83,7 @@ export function Reader({
                   timeZone: 'UTC',
                 })
               : 'Bonus lecture'}{' '}
-            <span>·</span> Vivek Gupta <span>·</span> B15
+            <span>·</span> Digital DSA notes
           </p>
         </div>
         <div className="reader-actions">
@@ -185,21 +187,10 @@ export function Reader({
               {note.summary ||
                 'Revisit the lecture concepts, worked examples, and explanations in the notes.'}
             </p>
-            {note.codeUrl ? (
-              <a
-                className="button wide"
-                href={note.codeUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Code2 size={17} /> View lecture code <ArrowUpRight size={15} />
-              </a>
-            ) : (
-              <div className="inline-hint">
-                <Code2 size={17} />
-                <span>Follow the code links inside the PDF.</span>
-              </div>
-            )}
+            <div className="inline-hint">
+              <FileText size={17} />
+              <span>Links included in the digital notes remain clickable.</span>
+            </div>
           </section>
           <section className="aside-card">
             <span className="section-kicker">PICK UP WHERE YOU LEFT OFF</span>

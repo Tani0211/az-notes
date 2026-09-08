@@ -407,7 +407,7 @@ svg {
   justify-content: space-between;
   margin: 0 7px 32px;
 }
-.batch-card {
+.collection-card {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -417,20 +417,20 @@ svg {
   border-radius: 11px;
   margin-bottom: 30px;
 }
-.batch-card strong {
+.collection-card strong {
   font-size: 13px;
   display: block;
 }
-.batch-card small {
+.collection-card small {
   font-size: 11px;
   color: var(--muted);
 }
-.batch-card .tiny-dot {
+.collection-card .tiny-dot {
   margin-left: auto;
   width: 5px;
   height: 5px;
 }
-.batch-icon {
+.collection-icon {
   background: var(--surface);
   color: var(--blue);
   font-size: 20px;
@@ -586,7 +586,7 @@ svg {
   font-size: 14px;
   color: var(--muted);
 }
-.cohort-badge {
+.library-badge {
   border: 1px solid var(--border);
   background: var(--surface);
   font-size: 10px;
@@ -1508,7 +1508,7 @@ td small {
   .page-heading .eyebrow {
     font-size: 10px;
   }
-  .cohort-badge {
+  .library-badge {
     display: none;
   }
   .overview {

@@ -31,7 +31,7 @@ try {
   await sql.begin(async (transaction) => {
     await transaction`SELECT pg_advisory_xact_lock(15150001)`;
     await transaction`
-      CREATE TABLE IF NOT EXISTS b15_migrations (
+      CREATE TABLE IF NOT EXISTS az_notes_migrations (
         name text PRIMARY KEY,
         checksum text NOT NULL,
         applied_at timestamptz NOT NULL DEFAULT now()
@@ -41,21 +41,21 @@ try {
       const source = await readFile(new URL(name, folder), 'utf8');
       const checksum = createHash('sha256').update(source).digest('hex');
       const [applied] =
-        await transaction`SELECT checksum FROM b15_migrations WHERE name = ${name}`;
+        await transaction`SELECT checksum FROM az_notes_migrations WHERE name = ${name}`;
       if (applied) {
         if (applied.checksum !== checksum)
           throw new Error('Applied migration changed: ' + name);
         continue;
       }
       await transaction.unsafe(source);
-      await transaction`INSERT INTO b15_migrations (name, checksum) VALUES (${name}, ${checksum})`;
+      await transaction`INSERT INTO az_notes_migrations (name, checksum) VALUES (${name}, ${checksum})`;
       console.log('Applied ' + name);
     }
 
     // Seed only the supplied digital notes. Re-running never overwrites the
     // owner's published edits, calendar changes, or reading history.
     const [seeded] =
-      await transaction`SELECT value FROM settings WHERE key = 'b15-seed-v1'`;
+      await transaction`SELECT value FROM settings WHERE key = 'az-notes-seed-v1'`;
     if (!seeded) {
       const notes = JSON.parse(
         await readFile(
@@ -65,12 +65,12 @@ try {
       );
       for (const note of notes) {
         await transaction`
-          INSERT INTO notes (id, title, topic, date, week, phase, summary, "driveUrl", "codeUrl", "fileKey", status, "updatedAt")
-          VALUES (${note.id}, ${note.title}, ${note.topic}, ${note.date}, ${note.week}, ${note.phase}, ${note.summary}, ${note.driveUrl}, ${note.codeUrl || ''}, '', 'published', ${Date.now()})
+          INSERT INTO notes (id, title, topic, date, week, phase, summary, "driveUrl", "fileKey", status, "updatedAt")
+          VALUES (${note.id}, ${note.title}, ${note.topic}, ${note.date}, ${note.week}, ${note.phase}, ${note.summary}, ${note.driveUrl}, '', 'published', ${Date.now()})
           ON CONFLICT (id) DO NOTHING
         `;
       }
-      await transaction`INSERT INTO settings (key, value) VALUES ('b15-seed-v1', 'imported') ON CONFLICT DO NOTHING`;
+      await transaction`INSERT INTO settings (key, value) VALUES ('az-notes-seed-v1', 'imported') ON CONFLICT DO NOTHING`;
       console.log('Imported ' + notes.length + ' digital notes.');
     }
     const calendar = JSON.parse(
