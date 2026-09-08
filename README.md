@@ -45,19 +45,19 @@ Open `http://localhost:3000`. The local Google callback is `http://localhost:300
 
 The Vercel project needs these environment variables:
 
-| Variable                | Purpose                                                        |
-| ----------------------- | -------------------------------------------------------------- |
-| `DATABASE_URL`          | Neon pooled PostgreSQL connection, supplied by the integration |
-| `BLOB_READ_WRITE_TOKEN` | Private Vercel Blob access, supplied by the connected store    |
-| `AUTH_SECRET`           | Random session-encryption secret                               |
-| `GOOGLE_CLIENT_ID`      | Google OAuth web client identifier                             |
-| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                                     |
-| `PUBLIC_ORIGIN`         | The production origin, such as `https://az-notes.vercel.app`   |
+| Variable                | Purpose                                                              |
+| ----------------------- | -------------------------------------------------------------------- |
+| `DATABASE_URL`          | Neon pooled PostgreSQL connection, supplied by the integration       |
+| `BLOB_READ_WRITE_TOKEN` | Private Vercel Blob access, supplied by the connected store          |
+| `AUTH_SECRET`           | Random session-encryption secret                                     |
+| `GOOGLE_CLIENT_ID`      | Google OAuth web client identifier                                   |
+| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret                                           |
+| `PUBLIC_ORIGIN`         | The production origin, such as `https://az-notes-tanishq.vercel.app` |
 
 The production Google callback is:
 
 ```text
-https://az-notes.vercel.app/api/auth/callback/google
+https://az-notes-tanishq.vercel.app/api/auth/callback/google
 ```
 
 Run `npm run db:migrate` after connecting a new database. It applies checked migrations and imports the 20 digital notes once. Re-running it does not overwrite later admin edits.

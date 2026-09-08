@@ -13,7 +13,7 @@ export function googleReady() {
 export function authOrigin() {
   return process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : process.env.PUBLIC_ORIGIN || 'https://az-notes.vercel.app';
+    : process.env.PUBLIC_ORIGIN || 'https://az-notes-tanishq.vercel.app';
 }
 export function authConfig(): AuthConfig {
   return {
