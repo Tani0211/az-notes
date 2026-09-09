@@ -86,7 +86,10 @@ export default async function Home() {
       </main>
       <footer className="welcome-footer">
         <span>An independent DSA learning library for every student.</span>
-        <span>Learn · Revisit · Grow</span>
+        <span>
+          <Link href="/privacy">Privacy</Link> ·{' '}
+          <Link href="/terms">Terms</Link>
+        </span>
       </footer>
     </div>
   );
