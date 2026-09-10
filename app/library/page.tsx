@@ -10,12 +10,14 @@ export default async function Library({
   const notes = await listNotes();
   const state = await readingState(user!.userId);
   const { view } = await searchParams;
+  const initialView = view === 'saved' || view === 'completed' ? view : 'all';
   return (
     <LibraryView
+      key={initialView}
       user={user!}
       notes={notes}
       initialState={state}
-      initialView={view === 'saved' || view === 'completed' ? view : 'all'}
+      initialView={initialView}
     />
   );
 }
