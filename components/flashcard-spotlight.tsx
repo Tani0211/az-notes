@@ -3,6 +3,7 @@
 import { ArrowRight, Layers3, RefreshCw, RotateCw } from 'lucide-react';
 import { useState } from 'react';
 import type { FlashcardView } from '../lib/types';
+import { MathText } from './math-text';
 
 export function FlashcardSpotlight({
   initialCard,
@@ -78,14 +79,18 @@ export function FlashcardSpotlight({
         <span className="flashcard-inner">
           <span className="flashcard-face flashcard-front">
             <small>QUESTION</small>
-            <strong>{card.question}</strong>
+            <strong>
+              <MathText>{card.question}</MathText>
+            </strong>
             <span>
               <RotateCw size={15} /> Tap to reveal
             </span>
           </span>
           <span className="flashcard-face flashcard-back">
             <small>ANSWER</small>
-            <strong>{card.answer}</strong>
+            <strong>
+              <MathText>{card.answer}</MathText>
+            </strong>
             <span>
               <RotateCw size={15} /> Tap for question
             </span>

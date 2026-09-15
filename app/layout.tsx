@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import 'katex/dist/katex.min.css';
 import './globals.css';
 export const metadata: Metadata = {
   title: 'AZ Notes · The DSA notebook',

@@ -1958,6 +1958,26 @@ td small {
   font-size: 11px;
   opacity: 0.75;
 }
+.math-text {
+  white-space: pre-wrap;
+}
+.math-inline {
+  display: inline;
+}
+.math-text .katex {
+  color: inherit;
+  font-size: 1em;
+}
+.math-display {
+  display: block;
+  max-width: 100%;
+  margin: 0.35em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.math-display .katex-display {
+  margin: 0;
+}
 .spin {
   animation: spin 0.8s linear infinite;
 }
