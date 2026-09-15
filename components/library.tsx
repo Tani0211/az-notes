@@ -24,12 +24,14 @@ export function LibraryView({
   user,
   initialView,
   initialFlashcard,
+  initialFlashcardClicks,
 }: {
   notes: Note[];
   initialState: ReadingState[];
   user: Viewer;
   initialView: string;
   initialFlashcard: FlashcardView | null;
+  initialFlashcardClicks: number;
 }) {
   const [query, setQuery] = useState(''),
     [phase, setPhase] = useState('all'),
@@ -144,7 +146,10 @@ export function LibraryView({
         </span>
       </div>
       {initialFlashcard && (
-        <FlashcardSpotlight initialCard={initialFlashcard} />
+        <FlashcardSpotlight
+          initialCard={initialFlashcard}
+          initialTodayClicks={initialFlashcardClicks}
+        />
       )}
       <div className="overview">
         <div className="overview-primary">

@@ -7,26 +7,33 @@ import { MathText } from './math-text';
 
 export function FlashcardSpotlight({
   initialCard,
+  initialTodayClicks,
 }: {
   initialCard: FlashcardView;
+  initialTodayClicks: number;
 }) {
   const [card, setCard] = useState(initialCard);
   const [flipped, setFlipped] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [todayClicks, setTodayClicks] = useState(initialTodayClicks);
 
   async function another() {
     setBusy(true);
     setError('');
     try {
       const response = await fetch('/api/flashcards/random', {
+        method: 'POST',
+        headers: { 'x-az-notes-action': '1' },
         cache: 'no-store',
       });
       const result = (await response.json()) as FlashcardView & {
         error?: string;
+        todayClicks?: number;
       };
       if (!response.ok) throw Error(result.error);
       setCard(result);
+      setTodayClicks(result.todayClicks ?? todayClicks + 1);
       setFlipped(false);
     } catch (reason) {
       setError(
@@ -68,6 +75,10 @@ export function FlashcardSpotlight({
           )}
           {busy ? 'Choosing…' : 'Another random card'}
         </button>
+        <span className="recall-count" aria-live="polite">
+          {todayClicks.toLocaleString('en-IN')} quick{' '}
+          {todayClicks === 1 ? 'recall' : 'recalls'} today
+        </span>
         {error && <p className="inline-error">{error}</p>}
       </div>
       <button

@@ -9,6 +9,7 @@ const [
   shortImage,
   flashcardImport,
   shortNoteWrite,
+  flashcardRandom,
 ] = await Promise.all([
   readFile('lib/google-auth.ts', 'utf8'),
   readFile('lib/server.ts', 'utf8'),
@@ -17,6 +18,7 @@ const [
   readFile('app/api/short-notes/[id]/image/route.ts', 'utf8'),
   readFile('app/api/flashcard-sets/route.ts', 'utf8'),
   readFile('app/api/short-notes/route.ts', 'utf8'),
+  readFile('app/api/flashcards/random/route.ts', 'utf8'),
 ]);
 assert.doesNotMatch(
   auth + server,
@@ -30,6 +32,8 @@ assert.match(shortImage, /await apiUser\(\)/);
 assert.match(shortImage, /access:\s*'private'/);
 assert.match(flashcardImport, /await apiUser\(req, true\)/);
 assert.match(shortNoteWrite, /await apiUser\(req, true\)/);
+assert.match(flashcardRandom, /export async function POST\(req: Request\)/);
+assert.match(flashcardRandom, /sameOrigin\(req\)/);
 console.log(
   'PASS: verified Google-only identity, admin-only content writes and private file storage.',
 );

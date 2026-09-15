@@ -47,6 +47,14 @@ assert.doesNotMatch(migration, /UNIQUE\s*\(question\)/i);
 assert.match(migration, /CREATE TABLE short_notes/);
 assert.match(migration, /"imageKey" text NOT NULL/);
 
+const usageMigration = await readFile(
+  'db/migrations/003_flashcard_usage.sql',
+  'utf8',
+);
+assert.match(usageMigration, /CREATE TABLE flashcard_daily_usage/);
+assert.match(usageMigration, /day text PRIMARY KEY/);
+assert.doesNotMatch(usageMigration, /userId|email|cardId/);
+
 console.log(
-  'PASS: CSV quoting, exact headers, independent deck schema and short-note storage.',
+  'PASS: CSV imports, independent decks, short notes and aggregate flashcard usage storage.',
 );

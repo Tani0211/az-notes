@@ -13,6 +13,7 @@ import type {
   FlashcardView,
   ShortNote,
 } from './types';
+import { indiaDateKey } from './date';
 export const ADMIN_EMAIL = 'singhalrashmi0211@gmail.com';
 export { db } from './database';
 export const isAdmin = (email: string) =>
@@ -112,6 +113,25 @@ export async function randomPublishedFlashcard() {
       'SELECT flashcards.*,flashcard_sets.name AS "setName",flashcard_sets.topic,flashcard_sets.phase,flashcard_sets.tag,flashcard_sets.source FROM flashcards JOIN flashcard_sets ON flashcard_sets.id=flashcards.setId WHERE flashcard_sets.status=\'published\' ORDER BY random() LIMIT 1',
     )
     .first<FlashcardView>();
+}
+
+export async function flashcardClicksToday() {
+  const result = await db()
+    .prepare('SELECT clicks FROM flashcard_daily_usage WHERE day=?')
+    .bind(indiaDateKey())
+    .first<{ clicks: number }>();
+  return result?.clicks || 0;
+}
+
+export async function recordFlashcardNext() {
+  const now = Date.now();
+  const result = await db()
+    .prepare(
+      'INSERT INTO flashcard_daily_usage (day,clicks,updatedAt) VALUES (?,1,?) ON CONFLICT(day) DO UPDATE SET clicks=flashcard_daily_usage.clicks+1,updatedAt=excluded.updatedAt RETURNING clicks',
+    )
+    .bind(indiaDateKey(now), now)
+    .first<{ clicks: number }>();
+  return result?.clicks || 1;
 }
 
 export async function listShortNotes(admin = false) {

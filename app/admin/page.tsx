@@ -8,7 +8,9 @@ import {
   getCalendar,
   listFlashcardSets,
   listShortNotes,
+  flashcardClicksToday,
 } from '../../lib/server';
+import { indiaDateKey } from '../../lib/date';
 import { AdminView } from '../../components/admin';
 import { Shell } from '../../components/shell';
 export const dynamic = 'force-dynamic';
@@ -34,40 +36,54 @@ export default async function Admin() {
     listFlashcardSets(true),
     listShortNotes(true),
   ]);
-  const [members, views, downloads, active, trend, popular, admins] =
-    await Promise.all([
-      db()
-        .prepare('SELECT COUNT(*) AS total FROM members')
-        .first<{ total: number }>(),
-      db()
-        .prepare("SELECT COUNT(*) AS total FROM events WHERE kind='view'")
-        .first<{ total: number }>(),
-      db()
-        .prepare("SELECT COUNT(*) AS total FROM events WHERE kind='download'")
-        .first<{ total: number }>(),
-      db()
-        .prepare('SELECT COUNT(*) AS total FROM members WHERE lastSeen>=?')
-        .bind(Date.now() - 86400000)
-        .first<{ total: number }>(),
-      db()
-        .prepare(
-          "SELECT to_char(to_timestamp(createdAt / 1000.0) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') AS day, COUNT(*) AS total FROM events WHERE createdAt>=? AND kind='view' GROUP BY day ORDER BY day",
-        )
-        .bind(Date.now() - 7 * 86400000)
-        .all<{ day: string; total: number }>(),
-      db()
-        .prepare(
-          "SELECT notes.title,COUNT(*) AS total FROM events JOIN notes ON notes.id=events.noteId WHERE events.kind='view' GROUP BY notes.id, notes.title ORDER BY total DESC LIMIT 5",
-        )
-        .all<{ title: string; total: number }>(),
-      user!.owner
-        ? db()
-            .prepare(
-              'SELECT email,createdAt FROM admins ORDER BY createdAt DESC',
-            )
-            .all<{ email: string; createdAt: number }>()
-        : Promise.resolve({ results: [] }),
-    ]);
+  const [
+    members,
+    views,
+    downloads,
+    active,
+    flashcardsToday,
+    trend,
+    flashcardTrend,
+    popular,
+    admins,
+  ] = await Promise.all([
+    db()
+      .prepare('SELECT COUNT(*) AS total FROM members')
+      .first<{ total: number }>(),
+    db()
+      .prepare("SELECT COUNT(*) AS total FROM events WHERE kind='view'")
+      .first<{ total: number }>(),
+    db()
+      .prepare("SELECT COUNT(*) AS total FROM events WHERE kind='download'")
+      .first<{ total: number }>(),
+    db()
+      .prepare('SELECT COUNT(*) AS total FROM members WHERE lastSeen>=?')
+      .bind(Date.now() - 86400000)
+      .first<{ total: number }>(),
+    flashcardClicksToday(),
+    db()
+      .prepare(
+        "SELECT to_char(to_timestamp(createdAt / 1000.0) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') AS day, COUNT(*) AS total FROM events WHERE createdAt>=? AND kind='view' GROUP BY day ORDER BY day",
+      )
+      .bind(Date.now() - 7 * 86400000)
+      .all<{ day: string; total: number }>(),
+    db()
+      .prepare(
+        'SELECT day,clicks FROM flashcard_daily_usage WHERE day>=? ORDER BY day',
+      )
+      .bind(indiaDateKey(Date.now() - 6 * 86400000))
+      .all<{ day: string; clicks: number }>(),
+    db()
+      .prepare(
+        "SELECT notes.title,COUNT(*) AS total FROM events JOIN notes ON notes.id=events.noteId WHERE events.kind='view' GROUP BY notes.id, notes.title ORDER BY total DESC LIMIT 5",
+      )
+      .all<{ title: string; total: number }>(),
+    user!.owner
+      ? db()
+          .prepare('SELECT email,createdAt FROM admins ORDER BY createdAt DESC')
+          .all<{ email: string; createdAt: number }>()
+      : Promise.resolve({ results: [] }),
+  ]);
   return (
     <AdminView
       user={user!}
@@ -82,8 +98,10 @@ export default async function Admin() {
         views: views?.total || 0,
         downloads: downloads?.total || 0,
         active: active?.total || 0,
+        flashcardClicksToday: flashcardsToday,
       }}
       trend={trend.results}
+      flashcardTrend={flashcardTrend.results}
       popular={popular.results}
     />
   );

@@ -40,6 +40,12 @@ assert.match(content.text, /"cardCount"/);
 assert.match(content.text, /"imageKey"/);
 assert.equal(content.parameters, 1);
 
+const flashcardUsage = compileQuery(
+  'INSERT INTO flashcard_daily_usage (day,clicks,updatedAt) VALUES (?,1,?) ON CONFLICT(day) DO UPDATE SET clicks=flashcard_daily_usage.clicks+1,updatedAt=excluded.updatedAt RETURNING clicks',
+);
+assert.equal(flashcardUsage.parameters, 2);
+assert.match(flashcardUsage.text, /"updatedAt"/);
+
 console.log(
   'PASS: PostgreSQL query compilation, content identifier quoting and safe integer parsing.',
 );

@@ -18,6 +18,7 @@ import { phaseForDate, type PhasePeriod } from '../lib/calendar';
 import { Shell } from './shell';
 import { AdminFlashcards } from './admin-flashcards';
 import { AdminShortNotes } from './admin-short-notes';
+import { indiaDateKey } from '../lib/date';
 const emptyNote: Note = {
   id: '',
   title: '',
@@ -38,8 +39,15 @@ type Props = {
   initialShortNotes: ShortNote[];
   ownerEmail: string;
   admins: { email: string; createdAt: number }[];
-  stats: { members: number; views: number; downloads: number; active: number };
+  stats: {
+    members: number;
+    views: number;
+    downloads: number;
+    active: number;
+    flashcardClicksToday: number;
+  };
   trend: { day: string; total: number }[];
+  flashcardTrend: { day: string; clicks: number }[];
   popular: { title: string; total: number }[];
 };
 export function AdminView({
@@ -52,6 +60,7 @@ export function AdminView({
   admins,
   stats,
   trend,
+  flashcardTrend,
   popular,
 }: Props) {
   const [calendar, setCalendar] = useState(initialCalendar);
@@ -184,12 +193,7 @@ export function AdminView({
   }
   const chartDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(chartNow - (6 - i) * 86400000);
-    const key = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(date);
+    const key = indiaDateKey(date);
     return {
       day: date.toLocaleDateString('en-IN', {
         weekday: 'short',
@@ -199,6 +203,21 @@ export function AdminView({
     };
   });
   const max = Math.max(1, ...chartDays.map((d) => d.total));
+  const flashcardChartDays = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(chartNow - (6 - i) * 86400000);
+    const key = indiaDateKey(date);
+    return {
+      day: date.toLocaleDateString('en-IN', {
+        weekday: 'short',
+        timeZone: 'Asia/Kolkata',
+      }),
+      total: flashcardTrend.find((item) => item.day === key)?.clicks || 0,
+    };
+  });
+  const flashcardMax = Math.max(
+    1,
+    ...flashcardChartDays.map((day) => day.total),
+  );
   return (
     <Shell user={user} active="admin">
       <div className="page-heading">
@@ -581,6 +600,7 @@ export function AdminView({
               ['Active in the last 24h', stats.active],
               ['Lecture opens', stats.views],
               ['Download requests', stats.downloads],
+              ['Flashcard refreshes today', stats.flashcardClicksToday],
             ].map(([label, total]) => (
               <div className="stat-card" key={label}>
                 <span>{label}</span>
@@ -617,6 +637,35 @@ export function AdminView({
               </p>
             </section>
             <section className="form-panel">
+              <h2>Flashcard refreshes</h2>
+              <p className="muted" style={{ fontSize: 12, marginTop: 8 }}>
+                “Another random card” clicks · last 7 days · India time
+              </p>
+              <figure
+                className="chart"
+                aria-label={flashcardChartDays
+                  .map((day) => `${day.day}: ${day.total} refreshes`)
+                  .join(', ')}
+              >
+                {flashcardChartDays.map((day, index) => (
+                  <div className="chart-col" key={index}>
+                    <span>{day.total}</span>
+                    <div
+                      className="chart-bar"
+                      style={{
+                        height: Math.max(2, (day.total / flashcardMax) * 120),
+                      }}
+                    />
+                    <span>{day.day}</span>
+                  </div>
+                ))}
+              </figure>
+              <p className="muted" style={{ fontSize: 12 }}>
+                Every successful refresh counts. The public homepage shows only
+                the combined total.
+              </p>
+            </section>
+            <section className="form-panel analytics-wide">
               <h2>Most-read lectures</h2>
               {popular.length ? (
                 popular.map((p, i) => (
@@ -639,7 +688,8 @@ export function AdminView({
           <p className="muted" style={{ fontSize: 12, marginTop: 20 }}>
             The header shows unique signed-in users active within two minutes.
             Downloads count successful website download requests; external Drive
-            downloads are not tracked. Usage totals include admins.
+            downloads are not tracked. Flashcard totals count successful random
+            card refreshes. Usage totals include admins.
           </p>
         </>
       )}

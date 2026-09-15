@@ -18,6 +18,7 @@
     "test:security": "node tests/check-security.mjs",
     "test:content": "node tests/check-content.mjs",
     "test:math": "node tests/check-math.mjs",
+    "test:date": "node tests/check-date.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs"
   },
   "dependencies": {

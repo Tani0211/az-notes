@@ -1247,7 +1247,7 @@ svg {
 }
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 16px;
   margin-bottom: 25px;
 }
@@ -1399,6 +1399,9 @@ td small {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 20px;
+}
+.analytics-wide {
+  grid-column: 1 / -1;
 }
 .chart {
   height: 190px;
@@ -1884,6 +1887,14 @@ td small {
   min-height: 38px;
   padding: 8px 12px;
   font-size: 12px;
+}
+.recall-count {
+  display: block;
+  width: fit-content;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
 }
 .inline-error {
   color: #cf4545 !important;

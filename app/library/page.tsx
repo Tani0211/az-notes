@@ -3,6 +3,7 @@ import {
   listNotes,
   readingState,
   randomPublishedFlashcard,
+  flashcardClicksToday,
 } from '../../lib/server';
 import { LibraryView } from '../../components/library';
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,10 @@ export default async function Library({
   const user = await viewer(true, '/library');
   const notes = await listNotes();
   const state = await readingState(user!.userId);
-  const flashcard = await randomPublishedFlashcard();
+  const [flashcard, todayClicks] = await Promise.all([
+    randomPublishedFlashcard(),
+    flashcardClicksToday(),
+  ]);
   const { view } = await searchParams;
   const initialView = view === 'saved' || view === 'completed' ? view : 'all';
   return (
@@ -25,6 +29,7 @@ export default async function Library({
       initialState={state}
       initialView={initialView}
       initialFlashcard={flashcard}
+      initialFlashcardClicks={todayClicks}
     />
   );
 }
