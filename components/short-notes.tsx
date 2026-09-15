@@ -1,9 +1,18 @@
 'use client';
 /* oxlint-disable nextjs/no-img-element -- Authenticated images cannot pass through the public image optimizer. */
 
-import { Code2, Image as ImageIcon, Search, StickyNote, X } from 'lucide-react';
+import {
+  Check,
+  Code2,
+  Copy,
+  Image as ImageIcon,
+  Search,
+  StickyNote,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { ShortNote, Viewer } from '../lib/types';
+import { MathText } from './math-text';
 import { Shell } from './shell';
 
 export function ShortNotesView({
@@ -16,6 +25,7 @@ export function ShortNotesView({
   const [query, setQuery] = useState('');
   const [topic, setTopic] = useState('All topics');
   const [phase, setPhase] = useState('all');
+  const [copied, setCopied] = useState('');
   const topics = [...new Set(notes.map((note) => note.topic))].sort();
   const filtered = notes.filter(
     (note) =>
@@ -25,6 +35,16 @@ export function ShortNotesView({
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
+
+  async function copyCode(note: ShortNote) {
+    try {
+      await navigator.clipboard.writeText(note.code);
+      setCopied(note.id);
+      window.setTimeout(() => setCopied(''), 1800);
+    } catch {
+      setCopied('');
+    }
+  }
 
   return (
     <Shell user={user} active="short-notes">
@@ -109,7 +129,11 @@ export function ShortNotesView({
                 </div>
               </summary>
               <div className="short-note-content">
-                {note.body && <p>{note.body}</p>}
+                {note.body && (
+                  <p>
+                    <MathText>{note.body}</MathText>
+                  </p>
+                )}
                 {note.imageKey && (
                   <a
                     className="short-note-image-link"
@@ -126,7 +150,21 @@ export function ShortNotesView({
                 )}
                 {note.code && (
                   <div className="short-note-code">
-                    <span>{note.language || 'code'}</span>
+                    <div className="short-note-code-head">
+                      <span>{note.language || 'code'}</span>
+                      <button
+                        type="button"
+                        onClick={() => void copyCode(note)}
+                        aria-label={`Copy code from ${note.title}`}
+                      >
+                        {copied === note.id ? (
+                          <Check size={13} />
+                        ) : (
+                          <Copy size={13} />
+                        )}
+                        {copied === note.id ? 'Copied' : 'Copy'}
+                      </button>
+                    </div>
                     <pre>
                       <code>{note.code}</code>
                     </pre>

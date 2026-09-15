@@ -1,6 +1,12 @@
 'use client';
 
-import { ArrowRight, Layers3, RefreshCw, RotateCw } from 'lucide-react';
+import {
+  Activity,
+  ArrowRight,
+  Layers3,
+  RefreshCw,
+  RotateCw,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { FlashcardView } from '../lib/types';
 import { MathText } from './math-text';
@@ -63,22 +69,25 @@ export function FlashcardSpotlight({
           {card.phase >= 0 && <span>Phase {card.phase}</span>}
           {card.tag && <span>{card.tag}</span>}
         </div>
-        <button
-          className="button recall-next"
-          disabled={busy}
-          onClick={() => void another()}
-        >
-          {busy ? (
-            <RefreshCw className="spin" size={16} />
-          ) : (
-            <ArrowRight size={16} />
-          )}
-          {busy ? 'Choosing…' : 'Another random card'}
-        </button>
-        <span className="recall-count" aria-live="polite">
-          {todayClicks.toLocaleString('en-IN')} quick{' '}
-          {todayClicks === 1 ? 'recall' : 'recalls'} today
-        </span>
+        <div className="recall-actions">
+          <button
+            className="button recall-next"
+            disabled={busy}
+            onClick={() => void another()}
+          >
+            {busy ? (
+              <RefreshCw className="spin" size={16} />
+            ) : (
+              <ArrowRight size={16} />
+            )}
+            {busy ? 'Choosing…' : 'Another random card'}
+          </button>
+          <span className="recall-count" aria-live="polite">
+            <Activity size={13} />
+            {todayClicks.toLocaleString('en-IN')} quick{' '}
+            {todayClicks === 1 ? 'recall' : 'recalls'} today
+          </span>
+        </div>
         {error && <p className="inline-error">{error}</p>}
       </div>
       <button
