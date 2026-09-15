@@ -824,6 +824,10 @@ svg {
   font-size: 14px;
   color: var(--text);
 }
+.search-field input[type='search']::-webkit-search-cancel-button {
+  display: none;
+  appearance: none;
+}
 .search-field:focus-within {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
