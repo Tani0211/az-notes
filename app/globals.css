@@ -2021,6 +2021,14 @@ td small {
   font-size: 12px;
   margin-top: 5px;
 }
+.card-admin-search {
+  width: min(100%, 520px);
+  margin-bottom: 16px;
+}
+.compact-empty {
+  min-height: 90px;
+  margin-bottom: 18px;
+}
 .manager-header-actions {
   display: flex;
   align-items: center;
@@ -2093,6 +2101,29 @@ td small {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.65;
+}
+.import-guide p + p {
+  margin-top: 8px;
+}
+.import-guide p code {
+  display: inline;
+  margin: 0;
+  padding: 1px 5px;
+}
+.csv-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  margin-top: -5px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.csv-check.ready {
+  color: #239666;
+}
+.csv-check.error {
+  color: #cf4545;
 }
 .csv-drop {
   min-height: 145px;

@@ -8,7 +8,9 @@ import {
   Layers3,
   Pencil,
   Plus,
+  Search,
   Trash2,
+  X,
 } from 'lucide-react';
 import { parseFlashcardCsv } from '../lib/flashcard-csv';
 import type { Flashcard, FlashcardSet } from '../lib/types';
@@ -46,7 +48,21 @@ export function AdminFlashcards({
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [cardQuery, setCardQuery] = useState('');
+  const [fileCheck, setFileCheck] = useState<{
+    kind: 'ready' | 'error';
+    text: string;
+  } | null>(null);
   const active = sets.find((set) => set.id === activeId) || null;
+  const visibleCards = active
+    ? active.cards
+        .map((card, index) => ({ card, index }))
+        .filter(({ card }) =>
+          `${card.question} ${card.answer}`
+            .toLowerCase()
+            .includes(cardQuery.trim().toLowerCase()),
+        )
+    : [];
 
   function clearNotices() {
     setError('');
@@ -58,6 +74,32 @@ export function AdminFlashcards({
     setSets((current) =>
       current.map((set) => (set.id === activeId ? { ...set, ...change } : set)),
     );
+  }
+
+  async function checkFile(selected: File | null) {
+    setFile(selected);
+    setFileCheck(null);
+    if (!selected) return;
+    if (selected.size > 2 * 1024 * 1024) {
+      setFileCheck({
+        kind: 'error',
+        text: 'Choose a CSV file no larger than 2 MB.',
+      });
+      return;
+    }
+    try {
+      const cards = parseFlashcardCsv(await selected.text());
+      setFileCheck({
+        kind: 'ready',
+        text: `${cards.length} valid ${cards.length === 1 ? 'card' : 'cards'} ready to import.`,
+      });
+    } catch (reason) {
+      setFileCheck({
+        kind: 'error',
+        text:
+          reason instanceof Error ? reason.message : 'Could not read this CSV.',
+      });
+    }
   }
 
   async function importCsv(event: React.SyntheticEvent<HTMLFormElement>) {
@@ -92,6 +134,7 @@ export function AdminFlashcards({
       setSets((current) => [result, ...current]);
       setMetadata(emptyMetadata);
       setFile(null);
+      setFileCheck(null);
       setImporting(false);
       setMessage(
         `${result.cardCount} cards imported as a new, independent deck.`,
@@ -277,11 +320,35 @@ export function AdminFlashcards({
           <div className="collection-title">
             <div>
               <h3>Cards in this upload</h3>
-              <p>{active.cards.length} question-and-answer pairs</p>
+              <p>
+                {cardQuery
+                  ? `${visibleCards.length} of ${active.cards.length} cards shown`
+                  : `${active.cards.length} question-and-answer pairs`}
+              </p>
             </div>
           </div>
+          <label className="search-field card-admin-search">
+            <Search size={17} />
+            <input
+              type="search"
+              value={cardQuery}
+              maxLength={150}
+              onChange={(event) => setCardQuery(event.target.value)}
+              placeholder="Search questions or answers…"
+              aria-label="Search cards in this deck"
+            />
+            {cardQuery && (
+              <button
+                type="button"
+                aria-label="Clear card search"
+                onClick={() => setCardQuery('')}
+              >
+                <X size={15} />
+              </button>
+            )}
+          </label>
           <div className="card-editor-list">
-            {active.cards.map((card, index) => (
+            {visibleCards.map(({ card, index }) => (
               <div className="card-editor" key={card.id}>
                 <span className="card-number">{index + 1}</span>
                 <label>
@@ -338,6 +405,11 @@ export function AdminFlashcards({
               </div>
             ))}
           </div>
+          {!visibleCards.length && cardQuery && (
+            <div className="empty-state compact-empty">
+              <p>No cards match this search.</p>
+            </div>
+          )}
           <form className="new-card-form" onSubmit={addCard}>
             <h3>Add one card</h3>
             <div className="form-grid">
@@ -400,6 +472,10 @@ export function AdminFlashcards({
                 must be wrapped in double quotes. Every upload creates a
                 separate deck and never merges with an earlier CSV.
               </p>
+              <p>
+                Write inline math as <code>$x^2$</code> and display math as{' '}
+                <code>$$x^2$$</code>. It renders automatically for students.
+              </p>
               <a
                 className="template-link"
                 href="/templates/flashcards-template.csv"
@@ -427,7 +503,7 @@ export function AdminFlashcards({
                 accept="text/csv,.csv"
                 onChange={(event) => {
                   const selected = event.target.files?.[0] || null;
-                  setFile(selected);
+                  void checkFile(selected);
                   if (selected && !metadata.name)
                     setMetadata((value) => ({
                       ...value,
@@ -436,6 +512,12 @@ export function AdminFlashcards({
                 }}
               />
             </label>
+            {fileCheck && (
+              <output className={`csv-check ${fileCheck.kind}`}>
+                {fileCheck.kind === 'ready' && <Check size={15} />}
+                {fileCheck.text}
+              </output>
+            )}
             <div className="form-actions">
               <span className="muted">
                 Import as draft first if you want to review every card.
@@ -486,6 +568,7 @@ export function AdminFlashcards({
                   className="button wide"
                   onClick={() => {
                     clearNotices();
+                    setCardQuery('');
                     setActiveId(set.id);
                   }}
                 >
