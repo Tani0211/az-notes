@@ -2489,6 +2489,18 @@ td small {
 }
 
 @media (max-width: 650px) {
+  .admin-tabs {
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+  .admin-tabs button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
   .recall-spotlight {
     padding: 14px;
   }
