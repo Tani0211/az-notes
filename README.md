@@ -1,6 +1,6 @@
 # AZ Notes
 
-An authenticated digital DSA notes library for students everywhere. It includes light and dark themes, phase and week organization, saved/revised progress, an owner-managed admin team, direct PDF uploads, Google Drive notes, usage analytics and a live online count.
+An authenticated digital DSA notes library for students everywhere. It includes light and dark themes, phase and week organization, saved/revised progress, random quick-recall flashcards, a separate Short Notes workspace, an owner-managed admin team, direct uploads, Google Drive notes, usage analytics and a live online count.
 
 The library contains only the author's digital lecture notes. Links embedded inside those PDFs continue to work.
 
@@ -12,6 +12,8 @@ The browser renders React pages from `app/` and reusable interface pieces from `
 - **Google OAuth through Auth.js** verifies each user's identity and stores an encrypted session cookie.
 - **Neon PostgreSQL** stores notes, members, reading progress, analytics, admins and the editable phase calendar.
 - **Private Vercel Blob** stores uploaded PDFs. Files are uploaded directly from the browser, checked on the server and streamed only after login.
+- **Flashcard decks** are imported from two-column `question,answer` CSV files. Every upload is stored independently with shared deck metadata and can be edited from the admin panel.
+- **Short Notes** are separate topic-wise posts containing brief text, one optional private image, and an optional code snippet.
 - Existing Google Drive PDFs remain subject to their Drive sharing settings.
 
 The owner is `singhalrashmi0211@gmail.com`. The owner can grant or revoke admin access by email from the admin panel. These permissions are checked on every request.
@@ -69,10 +71,11 @@ npm run check
 npm run test:calendar
 npm run test:database
 npm run test:security
+npm run test:content
 npm run build
 ```
 
-`npm run check` runs TypeScript and lint checks. The three focused tests validate phase boundaries, safe PostgreSQL query conversion and the important authentication/storage rules.
+`npm run check` runs TypeScript and lint checks. The focused tests validate phase boundaries, safe PostgreSQL query conversion, authentication/storage rules, CSV parsing and the independent content schema.
 
 ## A good first learning exercise
 

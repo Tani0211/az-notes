@@ -25,3 +25,54 @@ export type Viewer = {
   owner: boolean;
   signOutPath: string;
 };
+
+export type ContentStatus = 'published' | 'draft';
+
+export type Flashcard = {
+  id: string;
+  setId: string;
+  question: string;
+  answer: string;
+  position: number;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type FlashcardSet = {
+  id: string;
+  name: string;
+  topic: string;
+  phase: number;
+  tag: string;
+  source: string;
+  status: ContentStatus;
+  fileName: string;
+  cardCount: number;
+  createdAt: number;
+  updatedAt: number;
+  cards: Flashcard[];
+};
+
+export type FlashcardView = Flashcard & {
+  setName: string;
+  topic: string;
+  phase: number;
+  tag: string;
+  source: string;
+};
+
+export type ShortNote = {
+  id: string;
+  title: string;
+  topic: string;
+  phase: number;
+  tag: string;
+  source: string;
+  body: string;
+  code: string;
+  language: string;
+  imageKey: string;
+  status: ContentStatus;
+  createdAt: number;
+  updatedAt: number;
+};

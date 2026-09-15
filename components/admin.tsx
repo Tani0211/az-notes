@@ -13,9 +13,11 @@ import {
   Trash2,
   BookOpen,
 } from 'lucide-react';
-import type { Note, Viewer } from '../lib/types';
+import type { FlashcardSet, Note, ShortNote, Viewer } from '../lib/types';
 import { phaseForDate, type PhasePeriod } from '../lib/calendar';
 import { Shell } from './shell';
+import { AdminFlashcards } from './admin-flashcards';
+import { AdminShortNotes } from './admin-short-notes';
 const emptyNote: Note = {
   id: '',
   title: '',
@@ -32,6 +34,8 @@ type Props = {
   initialCalendar: PhasePeriod[];
   user: Viewer;
   initialNotes: Note[];
+  initialFlashcardSets: FlashcardSet[];
+  initialShortNotes: ShortNote[];
   ownerEmail: string;
   admins: { email: string; createdAt: number }[];
   stats: { members: number; views: number; downloads: number; active: number };
@@ -42,6 +46,8 @@ export function AdminView({
   initialCalendar,
   user,
   initialNotes,
+  initialFlashcardSets,
+  initialShortNotes,
   ownerEmail,
   admins,
   stats,
@@ -206,7 +212,7 @@ export function AdminView({
             it.
           </p>
         </div>
-        {!edit && (
+        {tab === 'notes' && !edit && (
           <button
             className="button primary"
             onClick={() => {
@@ -223,6 +229,8 @@ export function AdminView({
       <div className="tabs admin-tabs">
         {[
           ['notes', 'Manage notes'],
+          ['flashcards', 'Flashcards'],
+          ['short-notes', 'Short Notes'],
           ['analytics', 'Usage'],
           ['calendar', 'Course calendar'],
           ...(user.owner ? [['team', 'Admin access']] : []),
@@ -635,6 +643,12 @@ export function AdminView({
           </p>
         </>
       )}
+      {tab === 'flashcards' && (
+        <AdminFlashcards initialSets={initialFlashcardSets} />
+      )}
+      {tab === 'short-notes' && (
+        <AdminShortNotes initialNotes={initialShortNotes} />
+      )}
       {tab === 'calendar' && (
         <section className="form-panel">
           <h2>Your phase calendar</h2>
@@ -836,6 +850,43 @@ export function AdminView({
               Change it back to Draft to withdraw it.
             </li>
           </ol>
+          <h3 style={{ margin: '28px 0 10px' }}>Importing flashcards</h3>
+          <ol className="help-list">
+            <li>
+              <strong>Generate one topic at a time.</strong> Use NotebookLM
+              Studio Flashcards with your verified sources, or paste the prompt
+              below into Gemini.
+            </li>
+            <li>
+              <strong>Export the file.</strong> Download the NotebookLM deck as
+              CSV. Keep exactly two columns named <code>question</code> and{' '}
+              <code>answer</code>. One row becomes one card.
+            </li>
+            <li>
+              <strong>Add shared details once.</strong> Open Flashcards, choose
+              Import CSV, and enter the deck name, topic, phase, tag, source,
+              and visibility.
+            </li>
+            <li>
+              <strong>Review and publish.</strong> Import as Draft, open Manage
+              deck, correct any cards, and then change the deck to Published.
+              Every import remains independent from previous CSVs.
+            </li>
+          </ol>
+          <div className="prompt-template">
+            <strong>Flashcard generation prompt</strong>
+            <pre>{`Using only the verified sources selected for [TOPIC], create 15 DSA flashcards.
+Return a CSV with exactly two columns: question,answer.
+
+Each card must test one clear idea. Keep the question under 30 words. Begin the answer with the direct solution, followed by a brief explanation of why it works or when it applies. Include recognition signals, invariants, complexity, edge cases, common mistakes, and small applications. Do not ask students to memorize large code blocks. Do not use contradicted or unsupported claims. Properly quote CSV cells that contain commas or line breaks.`}</pre>
+          </div>
+          <h3 style={{ margin: '28px 0 10px' }}>Publishing Short Notes</h3>
+          <p className="admin-intro">
+            Create a small topic-wise post using written text, one optional
+            handwritten or digital image, and an optional code snippet. Save it
+            as a draft while checking it, then publish it to the separate Short
+            Notes workspace tab.
+          </p>
           <div className="notice">
             Uploaded PDFs are served through the website’s login checks. Drive
             files keep their existing Google sharing settings, so someone who

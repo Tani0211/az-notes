@@ -15,18 +15,21 @@ import {
   ArrowRight,
   Layers3,
 } from 'lucide-react';
-import type { Note, ReadingState, Viewer } from '../lib/types';
+import type { FlashcardView, Note, ReadingState, Viewer } from '../lib/types';
 import { Shell } from './shell';
+import { FlashcardSpotlight } from './flashcard-spotlight';
 export function LibraryView({
   notes,
   initialState,
   user,
   initialView,
+  initialFlashcard,
 }: {
   notes: Note[];
   initialState: ReadingState[];
   user: Viewer;
   initialView: string;
+  initialFlashcard: FlashcardView | null;
 }) {
   const [query, setQuery] = useState(''),
     [phase, setPhase] = useState('all'),
@@ -140,6 +143,9 @@ export function LibraryView({
           <span className="tiny-dot" /> DIGITAL DSA NOTES
         </span>
       </div>
+      {initialFlashcard && (
+        <FlashcardSpotlight initialCard={initialFlashcard} />
+      )}
       <div className="overview">
         <div className="overview-primary">
           <div>

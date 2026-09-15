@@ -6,6 +6,8 @@ import {
   db,
   ADMIN_EMAIL,
   getCalendar,
+  listFlashcardSets,
+  listShortNotes,
 } from '../../lib/server';
 import { AdminView } from '../../components/admin';
 import { Shell } from '../../components/shell';
@@ -27,7 +29,11 @@ export default async function Admin() {
         </div>
       </Shell>
     );
-  const notes = await listNotes(true);
+  const [notes, flashcardSets, shortNotes] = await Promise.all([
+    listNotes(true),
+    listFlashcardSets(true),
+    listShortNotes(true),
+  ]);
   const [members, views, downloads, active, trend, popular, admins] =
     await Promise.all([
       db()
@@ -67,6 +73,8 @@ export default async function Admin() {
       user={user!}
       initialCalendar={await getCalendar()}
       initialNotes={notes}
+      initialFlashcardSets={flashcardSets}
+      initialShortNotes={shortNotes}
       ownerEmail={ADMIN_EMAIL}
       admins={admins.results}
       stats={{

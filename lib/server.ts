@@ -4,7 +4,15 @@ import { googleUser } from './google-auth';
 import { db } from './database';
 import { redirect } from 'next/navigation';
 import seed from '../content/seed.json';
-import type { Note, Viewer, ReadingState } from './types';
+import type {
+  Note,
+  Viewer,
+  ReadingState,
+  Flashcard,
+  FlashcardSet,
+  FlashcardView,
+  ShortNote,
+} from './types';
 export const ADMIN_EMAIL = 'singhalrashmi0211@gmail.com';
 export { db } from './database';
 export const isAdmin = (email: string) =>
@@ -74,6 +82,55 @@ export async function listNotes(admin = false) {
     )
     .all<Note>();
   return results;
+}
+
+export async function listFlashcardSets(admin = false) {
+  const { results: sets } = await db()
+    .prepare(
+      admin
+        ? 'SELECT * FROM flashcard_sets ORDER BY createdAt DESC,id DESC'
+        : "SELECT * FROM flashcard_sets WHERE status='published' ORDER BY createdAt DESC,id DESC",
+    )
+    .all<Omit<FlashcardSet, 'cards'>>();
+  if (!sets.length) return [] as FlashcardSet[];
+  const { results: cards } = await db()
+    .prepare(
+      admin
+        ? 'SELECT * FROM flashcards ORDER BY setId,position'
+        : "SELECT flashcards.* FROM flashcards JOIN flashcard_sets ON flashcard_sets.id=flashcards.setId WHERE flashcard_sets.status='published' ORDER BY flashcards.setId,flashcards.position",
+    )
+    .all<Flashcard>();
+  return sets.map((set) => ({
+    ...set,
+    cards: cards.filter((card) => card.setId === set.id),
+  }));
+}
+
+export async function randomPublishedFlashcard() {
+  return db()
+    .prepare(
+      'SELECT flashcards.*,flashcard_sets.name AS "setName",flashcard_sets.topic,flashcard_sets.phase,flashcard_sets.tag,flashcard_sets.source FROM flashcards JOIN flashcard_sets ON flashcard_sets.id=flashcards.setId WHERE flashcard_sets.status=\'published\' ORDER BY random() LIMIT 1',
+    )
+    .first<FlashcardView>();
+}
+
+export async function listShortNotes(admin = false) {
+  const { results } = await db()
+    .prepare(
+      admin
+        ? 'SELECT * FROM short_notes ORDER BY createdAt DESC,id DESC'
+        : "SELECT * FROM short_notes WHERE status='published' ORDER BY createdAt DESC,id DESC",
+    )
+    .all<ShortNote>();
+  return results;
+}
+
+export async function findShortNote(id: string, admin = false) {
+  const note = await db()
+    .prepare('SELECT * FROM short_notes WHERE id=?')
+    .bind(id)
+    .first<ShortNote>();
+  return note && (note.status === 'published' || admin) ? note : null;
 }
 export async function findNote(id: string, admin = false) {
   await initialize();
@@ -204,6 +261,86 @@ export function validateNote(input: unknown): Omit<Note, 'id' | 'updatedAt'> {
     driveUrl,
     fileKey,
     status,
+  };
+}
+
+function inputObject(input: unknown, message: string) {
+  if (!input || typeof input !== 'object') throw new ApiError(message);
+  return input as Record<string, unknown>;
+}
+
+function inputString(input: Record<string, unknown>, key: string, max: number) {
+  const value = input[key] ?? '';
+  if (typeof value !== 'string' || value.length > max)
+    throw new ApiError(`Please check the ${key} field.`);
+  return value.trim();
+}
+
+function inputPhase(value: unknown) {
+  const phase = Number(value ?? -1);
+  if (!Number.isInteger(phase) || phase < -1 || phase > 5)
+    throw new ApiError('Choose a phase from 0 to 5.');
+  return phase;
+}
+
+function inputStatus(value: unknown) {
+  if (value !== 'draft' && value !== 'published')
+    throw new ApiError('Choose draft or published.');
+  return value;
+}
+
+export function validateFlashcardSet(input: unknown) {
+  const value = inputObject(input, 'Flashcard deck details are required.');
+  const name = inputString(value, 'name', 120);
+  const topic = inputString(value, 'topic', 80);
+  if (!name || !topic)
+    throw new ApiError('A deck name and topic are required.');
+  return {
+    name,
+    topic,
+    phase: inputPhase(value.phase),
+    tag: inputString(value, 'tag', 200),
+    source: inputString(value, 'source', 500),
+    status: inputStatus(value.status),
+    fileName: inputString(value, 'fileName', 200),
+  };
+}
+
+export function validateFlashcard(input: unknown) {
+  const value = inputObject(input, 'Flashcard details are required.');
+  const question = inputString(value, 'question', 500);
+  const answer = inputString(value, 'answer', 5000);
+  if (!question || !answer)
+    throw new ApiError('A question and answer are required.');
+  return { question, answer };
+}
+
+export function validateShortNote(input: unknown) {
+  const value = inputObject(input, 'Short note details are required.');
+  const title = inputString(value, 'title', 150);
+  const topic = inputString(value, 'topic', 80);
+  const body = inputString(value, 'body', 12000);
+  const code = inputString(value, 'code', 12000);
+  const imageKey = inputString(value, 'imageKey', 220);
+  if (!title || !topic) throw new ApiError('A title and topic are required.');
+  if (!body && !code && !imageKey)
+    throw new ApiError('Add written content, a code snippet, or an image.');
+  if (
+    imageKey &&
+    !/^short-notes\/[a-f0-9-]{36}\.(png|jpe?g|webp)$/.test(imageKey)
+  )
+    throw new ApiError('Invalid short-note image.');
+  return {
+    title,
+    topic,
+    phase: inputPhase(value.phase),
+    tag: inputString(value, 'tag', 200),
+    source: inputString(value, 'source', 500),
+    body,
+    code,
+    language: inputString(value, 'language', 30) || 'cpp',
+    imageKey,
+    status: inputStatus(value.status),
   };
 }
 

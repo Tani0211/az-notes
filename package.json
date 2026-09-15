@@ -16,6 +16,7 @@
     "test:calendar": "node tests/check-calendar.mjs",
     "test:database": "node tests/check-database.mjs",
     "test:security": "node tests/check-security.mjs",
+    "test:content": "node tests/check-content.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs"
   },
   "dependencies": {

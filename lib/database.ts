@@ -15,6 +15,10 @@ const preservedIdentifiers = new Map(
     'lastPage',
     'createdAt',
     'addedBy',
+    'setId',
+    'fileName',
+    'cardCount',
+    'imageKey',
   ].map((name) => [name.toLowerCase(), name]),
 );
 

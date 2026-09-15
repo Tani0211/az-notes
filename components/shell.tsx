@@ -12,6 +12,7 @@ import {
   X,
   Users,
   GraduationCap,
+  StickyNote,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ThemeToggle } from './theme-toggle';
@@ -100,6 +101,12 @@ export function Shell({
             <Library size={19} /> Notes library
           </Link>
           <Link
+            className={active === 'short-notes' ? 'selected' : ''}
+            href="/short-notes"
+          >
+            <StickyNote size={19} /> Short Notes
+          </Link>
+          <Link
             className={active === 'saved' ? 'selected' : ''}
             href="/library?view=saved"
           >
@@ -148,7 +155,11 @@ export function Shell({
             <span>
               Workspace <span className="breadcrumb-slash">/</span>{' '}
               <strong>
-                {active === 'admin' ? 'Administration' : 'Lecture library'}
+                {active === 'admin'
+                  ? 'Administration'
+                  : active === 'short-notes'
+                    ? 'Short Notes'
+                    : 'Lecture library'}
               </strong>
             </span>
           </div>

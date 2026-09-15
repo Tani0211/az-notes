@@ -32,6 +32,14 @@ assert.throws(() => compileQuery('SELECT $1'));
 assert.equal(parseSafeInteger('9007199254740991'), Number.MAX_SAFE_INTEGER);
 assert.throws(() => parseSafeInteger('9007199254740992'));
 
+const content = compileQuery(
+  'SELECT setId,cardCount,imageKey FROM flashcards WHERE setId=?',
+);
+assert.match(content.text, /"setId"/);
+assert.match(content.text, /"cardCount"/);
+assert.match(content.text, /"imageKey"/);
+assert.equal(content.parameters, 1);
+
 console.log(
-  'PASS: PostgreSQL query compilation, identifier quoting and safe integer parsing.',
+  'PASS: PostgreSQL query compilation, content identifier quoting and safe integer parsing.',
 );

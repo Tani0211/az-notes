@@ -1,4 +1,9 @@
-import { viewer, listNotes, readingState } from '../../lib/server';
+import {
+  viewer,
+  listNotes,
+  readingState,
+  randomPublishedFlashcard,
+} from '../../lib/server';
 import { LibraryView } from '../../components/library';
 export const dynamic = 'force-dynamic';
 export default async function Library({
@@ -9,6 +14,7 @@ export default async function Library({
   const user = await viewer(true, '/library');
   const notes = await listNotes();
   const state = await readingState(user!.userId);
+  const flashcard = await randomPublishedFlashcard();
   const { view } = await searchParams;
   const initialView = view === 'saved' || view === 'completed' ? view : 'all';
   return (
@@ -18,6 +24,7 @@ export default async function Library({
       notes={notes}
       initialState={state}
       initialView={initialView}
+      initialFlashcard={flashcard}
     />
   );
 }
